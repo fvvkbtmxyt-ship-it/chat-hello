@@ -1,126 +1,120 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>محادثة بسيطة</title>
-  <style>
-    body {
-      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-      direction: rtl;
-      padding: 28px;
-      background: #f6f7fb;
-      color: #111;
-    }
-    .card {
-      max-width: 560px;
-      margin: 24px auto;
-      background: #fff;
-      padding: 18px;
-      border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(30,40,60,0.08);
-    }
-    h1 { margin: 0 0 12px 0; font-size: 20px; }
-    .row { display:flex; gap:8px; margin-top:12px; }
-    input[type="text"]{
-      flex:1; padding:10px 12px; font-size:16px; border-radius:8px; border:1px solid #ddd;
-    }
-    button { padding:10px 14px; font-size:15px; border-radius:8px; border: none; cursor:pointer; }
-    .btn-primary { background:#1976d2; color:#fff; }
-    .btn-voice { background:#4caf50; color:#fff; }
-    .output { margin-top:16px; padding:12px; background:#f0f6ff; border-radius:8px; min-height:44px; }
-    .small { font-size:13px; color:#666; margin-top:8px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>استمارة جرد العاطلين عن العمل  </title>
+<style>
+body { font-family: "Segoe UI", Tahoma, Arial, sans-serif; direction: rtl; margin:0; padding:0; background:#eef2f7; text-align:center;}
+.page { display:none; padding: 40px; }
+.active { display:block; }
+h1 { color:#222; }
+.box { background:#fff; padding:25px; margin:20px auto; border-radius:12px; max-width:520px; box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+input, select { width: 90%; padding:12px; margin:10px 0; border-radius:6px; border:1px solid #ccc; font-size:16px; }
+button { padding:12px 25px; font-size:16px; border:none; border-radius:8px; cursor:pointer; transition:0.3s;}
+.red-btn { background:#e53935; color:white; }
+.red-btn:hover { background:#d32f2f; }
+img { max-width:100%; border-radius:10px; margin:20px 0; }
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>تجربة: قل أو اكتب "مرحبا"</h1>
 
-    <div class="row">
-      <input id="textInput" type="text" placeholder="اكتب هنا... مثال: مرحبا" autocomplete="off" />
-      <button id="sendBtn" class="btn-primary">أرسل</button>
-      <button id="voiceBtn" class="btn-voice">🎤 كلام</button>
-    </div>
+<!-- الصفحة 1: الترحيب -->
+<div id="page1" class="page active">
+ <h1>استمارة جرد بيانات العاطلين عن العمل</h1>
 
-    <div class="output" id="reply">الرد سيظهر هنا...</div>
-    <div class="small">ملاحظة: خاصية التعرف على الكلام تعمل في متصفحات تدعم Web Speech API (مثل Chrome على الحاسوب).</div>
+<!-- العبارة الجديدة -->
+<p style="color:red; font-weight:bold; font-size:18px;">الأستاذ علي العبادي في خدمتكم</p>
+
+<p>إذا كنت توافق على الشروط والأحكام اضغط نعم</p>
+<button class="red-btn" onclick="gotoPage(2)">نعم</button>>
   </div>
+</div>
 
-  <script>
-    const textInput = document.getElementById('textInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const reply = document.getElementById('reply');
-    const voiceBtn = document.getElementById('voiceBtn');
+<!-- الصفحة 2: الاستمارة -->
+<div id="page2" class="page">
+ <img src="IMG_0193.webp" alt="قبور">
+  <h1>تشغيل الشباب العاطلين عن العمل في مقابر العراق</h1>
+  <div class="box">
+    <input type="text" id="fullname" placeholder="الاسم الرباعي واللقب">
+    <input type="text" id="mothername" placeholder="اسم الام الثلاثي">
+    <input type="text" id="education" placeholder="التحصيل الدراسي">
+    <input type="text" id="province" placeholder="المحافظة">
+    <input type="text" id="address" placeholder="عنوان السكن الدقيق">
+    <input type="text" id="cemetery" placeholder="اقرب مقبرة عليك/ي">
+    <select id="workedBefore">
+      <option value="">هل عملت سابقا في مقبرة؟</option>
+      <option value="نعم">نعم</option>
+      <option value="لا">لا</option>
+    </select>
+    <input type="text" id="phone" placeholder="رقم الهاتف">
+    <button class="red-btn" onclick="submitForm()">ارسال</button>
+  </div>
+</div>
 
-    function normalizeArabic(str) {
-      // تبسيط النص لإجراء مقارنة مرنة
-      return str.trim()
-                .replace(/[.,!?؛،«»"']/g, '')
-                .replace(/\s+/g, ' ')
-                .toLowerCase();
-    }
+<!-- الصفحة 3: تأكيد -->
+<div id="page3" class="page">
+  <h1>تم ارسال البيانات بنجاح</h1>
+  <p>يمكنك تحميل نسخة من بياناتك المحفوظة:</p>
+  <button class="red-btn" id="downloadBtn">تحميل CSV</button>
+</div>
 
-    function handleMessage(message) {
-      const n = normalizeArabic(message);
-      // إذا بدأ المستخدم بـ "مرحبا" نرد "اهلا بك"
-      if (n.startsWith('مرحبا')) {
-        reply.textContent = 'اهلا بك';
-      } else {
-        reply.textContent = 'لم أتعرف على "مرحبا". جرّب أن تقول أو تكتب: مرحبا';
-      }
-    }
+<script>
+let formData = [];
 
-    sendBtn.addEventListener('click', () => {
-      handleMessage(textInput.value || '');
-      textInput.focus();
+function gotoPage(num){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page'+num).classList.add('active');
+}
+
+function submitForm(){
+  const fullname = document.getElementById('fullname').value.trim();
+  const mothername = document.getElementById('mothername').value.trim();
+  const education = document.getElementById('education').value.trim();
+  const province = document.getElementById('province').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const cemetery = document.getElementById('cemetery').value.trim();
+  const workedBefore = document.getElementById('workedBefore').value;
+  const phone = document.getElementById('phone').value.trim();
+
+  if(!fullname || !mothername || !education || !province || !address || !cemetery || !workedBefore || !phone){
+    alert("يرجى تعبئة جميع الحقول قبل الإرسال!");
+    return;
+  }
+
+  // حفظ البيانات في مصفوفة
+  formData.push({
+    "الاسم الرباعي": fullname,
+    "اسم الأم": mothername,
+    "التحصيل الدراسي": education,
+    "المحافظة": province,
+    "عنوان السكن": address,
+    "اقرب مقبرة": cemetery,
+    "هل عملت سابقا": workedBefore,
+    "رقم الهاتف": phone
+  });
+
+  // الانتقال إلى صفحة التأكيد
+  gotoPage(3);
+
+  // تجهيز زر التحميل
+  const downloadBtn = document.getElementById('downloadBtn');
+  downloadBtn.onclick = () => {
+    let csv = "data:text/csv;charset=utf-8,";
+    csv += Object.keys(formData[0]).join(",") + "\n";
+    formData.forEach(row => {
+      csv += Object.values(row).join(",") + "\n";
     });
+    const encodedUri = encodeURI(csv);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "form_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+}
+</script>
 
-    textInput.addEventListener('keyup', (e) => {
-      if (e.key === 'Enter') sendBtn.click();
-    });
-
-    // --- التعرف الصوتي (اختياري) ---
-    let recognition = null;
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SR();
-      recognition.lang = 'ar-IQ'; // لهجة عربية عراقية كمثال
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      recognition.onstart = () => {
-        voiceBtn.textContent = '🔊 استمع... اضغط لإيقاف';
-      };
-      recognition.onend = () => {
-        voiceBtn.textContent = '🎤 كلام';
-      };
-      recognition.onerror = (e) => {
-        reply.textContent = 'حدث خطأ في التعرف على الصوت: ' + (e.error || 'خطأ غير معروف');
-      };
-      recognition.onresult = (ev) => {
-        const spoken = ev.results[0][0].transcript || '';
-        // عرض النص في حقل الإدخال ثم المعالجة
-        textInput.value = spoken;
-        handleMessage(spoken);
-      };
-    } else {
-      voiceBtn.disabled = true;
-      voiceBtn.title = 'التعرف على الكلام غير مدعوم في متصفحك';
-    }
-
-    voiceBtn.addEventListener('click', () => {
-      if (!recognition) return;
-      // إذا كان يعمل الآن، إيقافه وإلا بدء الاستماع
-      try {
-        if (voiceBtn.textContent.includes('استمع')) {
-          recognition.stop();
-        } else {
-          recognition.start();
-        }
-      } catch (err) {
-        reply.textContent = 'تعذر تشغيل التعرف على الصوت: ' + err;
-      }
-    });
-  </script>
 </body>
 </html>
